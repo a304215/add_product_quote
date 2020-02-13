@@ -50,8 +50,11 @@
         </header>
         <div class="slds-modal__content slds-p-around_medium">
           <div>
-            <lightning-input name="enter-search" type="text" onkeyup={handleKeyUp}
-            ></lightning-input>
+            <lightning-datatable  key-field="Id" 
+            data={add_product_display_list} 
+            columns={add_prisect_discount_columns} 
+            show-row-number-column="true"> 
+            </lightning-datatable> 
           </div>
         </div>                   
         <footer class="slds-modal__footer">
