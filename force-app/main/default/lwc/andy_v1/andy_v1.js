@@ -13,6 +13,7 @@ export default class DemoButtonMenu extends LightningElement {
     @track product;
     @track error;
     @track add_product_choose_product = false; // if true choose_product will be present
+    @track add_product_discount = false; // if true add_prisect_discount will be present
     @track columns = columns;
     @track add_product_display_list = [];
     @track get_select_list = [];
@@ -65,8 +66,9 @@ export default class DemoButtonMenu extends LightningElement {
         this.add_product_choose_product = false;
     }
     add_product_choose_product_next_page(){//this function is for add_product
-        //this.add_product_choose_product = false;
         this.getSelected();
+        //this.add_product_choose_product = false;
+
     }
     handleKeyUp(evt) {//輸入文字按enter搜尋文字
         const isEnterKey = evt.keyCode === 13;
