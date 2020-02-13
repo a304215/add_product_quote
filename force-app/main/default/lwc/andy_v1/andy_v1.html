@@ -15,12 +15,6 @@
         <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
             <div class="slds-modal__container">
               <header class="slds-modal__header">
-                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={close_page}>
-                  <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
-                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#close"></use>
-                  </svg>
-                  <span class="slds-assistive-text">Close</span>
-                </button> 
                 <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Add Product</h2>
                 <h2 id="model-heading-02" class="header-font slds-hyphenate">Price Book: TTSC-TSC-CNY List Pricebook</h2>
               </header>
@@ -32,9 +26,6 @@
                       onkeyup={handleKeyUp}
                   ></lightning-input>
               </div>
-              <p if:true={queryTerm}>
-                  Searched for {queryTerm}!
-              </p>
               </div>  
               <div style="height: 300px;"> 
                 <lightning-datatable  key-field="Id" 
@@ -44,8 +35,8 @@
                 </lightning-datatable> 
               </div>                  
               <footer class="slds-modal__footer">
-                <button class="slds-button slds-button_neutral" onclick={close_page}>Cancel</button>
-                <button class="slds-button slds-button_brand" onclick={next_page}>Save</button>
+                <button class="slds-button slds-button_neutral" onclick={add_product_choose_product_close_page}>Cancel</button>
+                <button class="slds-button slds-button_brand" onclick={add_product_choose_product_next_page}>Save</button>
               </footer>
             </div>
           </section>
