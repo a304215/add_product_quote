@@ -1,3 +1,15 @@
 .header_font{
     font-size: 10px;
 }
+.title_bg{
+    background-color: var(--lwc-colorBackground,rgb(243, 242, 242));
+}
+.title_div{
+    width: 30%;
+}
+.space{
+    width: 10%;
+}
+label{
+    font-size: 20px;
+}

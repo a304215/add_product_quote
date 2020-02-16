@@ -1,6 +1,7 @@
 import { LightningElement, api, track ,wire} from 'lwc';
 import ReturnPBEList from '@salesforce/apex/NewProductByDiscount.ReturnPBEList';
 import ReturnPBEList_search from '@salesforce/apex/NewProductByDiscount.ReturnPBEList_search';
+
 const columns = [ 
     { label: 'Name', fieldName: 'nameUrl',
     type: 'url',
@@ -8,14 +9,6 @@ const columns = [
     { label: 'part number', fieldName: 'productcode'},
     { label: 'List Price', fieldName: 'nuitprice'}
 ];
-const add_prisect_discount_columns = [
-    { label: 'Product', fieldName: 'nameUrl',
-    type: 'url',
-    typeAttributes: {label:{fieldName:'Name'},target: '_blank'}}, 
-    { label: 'Quantity',editable : true},
-    { label: 'List Price', fieldName: 'nuitprice',editable:false},
-    { label: 'discount',editable:true}
-]
 export default class DemoButtonMenu extends LightningElement {
     @api recordId;
     @track product;
@@ -23,7 +16,6 @@ export default class DemoButtonMenu extends LightningElement {
     @track add_product_choose_product = false; // if true choose_product will be present
     @track add_product_discount = false; // if true add_prisect_discount will be present
     @track columns = columns;   
-    @track add_prisect_discount_columns = add_prisect_discount_columns;
     @track add_product_display_list = [];
     @track
     items = [
@@ -75,9 +67,6 @@ export default class DemoButtonMenu extends LightningElement {
     }
     add_product_choose_product_next_page(){//this function is for add_product
         this.add_product_discount = true;
-        this.getSelected();
-        this.add_product_display_list = [];
-        this.do_for();
         this.add_product_choose_product = false;
 
     }
@@ -97,8 +86,5 @@ export default class DemoButtonMenu extends LightningElement {
                 this.error = error;
             });
         }
-    }
-    getSelected() {
-        this.product = this.template.querySelector('c-datatable').getSelectedRows();
     }
 }

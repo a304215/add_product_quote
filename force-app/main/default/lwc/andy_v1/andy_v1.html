@@ -48,14 +48,31 @@
           <h2  class="slds-modal__title slds-hyphenate">Add Product</h2>
           <h2  class="header-font slds-hyphenate">Price Book: TTSC-TSC-CNY List Pricebook</h2>
         </header>
-        <div class="slds-modal__content slds-p-around_medium">
-          <div>
-            <lightning-datatable  key-field="Id" 
-            data={add_product_display_list} 
-            columns={add_prisect_discount_columns} 
-            show-row-number-column="true"> 
-            </lightning-datatable> 
+        <div>
+          <div class="slds-th__action title_bg">
+            <div class="space">
+              <span>&nbsp;</span>
+            </div>
+            <div class="title_div">
+              <label>*Product</label>
+            </div>
+            <div class="title_div">
+              <label>*Quantity</label>
+            </div>
+            <div class="title_div">
+              <label>List Price</label>
+            </div>
+            <div class="title_div">
+              <label>Discount</label>
+            </div>
           </div>
+          <template for:each={select_list} for:item = 'list_data'>
+            <p key={list_data}>{list_data.name}</p>
+            <lightning-input-field field_name = {list_data_inputbox_number}></lightning-input-field>
+            <lightning-input-field></lightning-input-field><!--以下四個input-field為4個輸入-->
+            <lightning-input-field></lightning-input-field>
+            <lightning-input-field></lightning-input-field>
+            <lightning-input-field></lightning-input-field>
         </div>                   
         <footer class="slds-modal__footer">
           <button class="slds-button slds-button_neutral" onclick={add_product_choose_product_close_page}>Cancel</button>
