@@ -49,35 +49,20 @@
           <h2  class="header-font slds-hyphenate">Price Book: TTSC-TSC-CNY List Pricebook</h2>
         </header>
         <div>
-          <div class="slds-th__action title_bg">
-            <div class="space">
-              <span>&nbsp;</span>
-            </div>
-            <div class="title_div">
-              <label>*Product</label>
-            </div>
-            <div class="title_div">
-              <label>*Quantity</label>
-            </div>
-            <div class="title_div">
-              <label>List Price</label>
-            </div>
-            <div class="title_div">
-              <label>Discount</label>
-            </div>
-          </div>
-          <template for:each={select_list} for:item = 'list_data'>
-            <p key={list_data}>{list_data.name}</p>
-            <lightning-input-field field_name = {list_data_inputbox_number}></lightning-input-field>
-            <lightning-input-field></lightning-input-field><!--以下四個input-field為4個輸入-->
-            <lightning-input-field></lightning-input-field>
-            <lightning-input-field></lightning-input-field>
-            <lightning-input-field></lightning-input-field>
-        </div>                   
-        <footer class="slds-modal__footer">
-          <button class="slds-button slds-button_neutral" onclick={add_product_choose_product_close_page}>Cancel</button>
-          <button class="slds-button slds-button_brand" onclick={add_product_choose_product_next_page}>Save</button>
-        </footer>
+          <div style="height: 300px;"> 
+            <lightning-datatable  key-field="Id" 
+                                  data={add_product_discount_list} 
+                                  columns={discount_column} 
+                                  show-row-number-column="true"
+                                  onsave={handleSave}
+                                  draft-values={draftValues}> 
+            </lightning-datatable> 
+          </div>                   
+          <footer class="slds-modal__footer">
+            <button class="slds-button slds-button_neutral" onclick={add_product_discount_close_page}>Cancel</button>
+            <button class="slds-button slds-button_brand" onclick={add_product_discount_next_page}>Save</button>
+          </footer>
+        </div>
       </div>
     </section>
     <div class="slds-backdrop slds-backdrop_open"></div>

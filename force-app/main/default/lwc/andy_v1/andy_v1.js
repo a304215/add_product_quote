@@ -7,8 +7,14 @@ const columns = [
     type: 'url',
     typeAttributes: {label:{fieldName:'Name'},target: '_blank'}}, 
     { label: 'part number', fieldName: 'productcode'},
-    { label: 'List Price', fieldName: 'nuitprice'}
+    { label: 'List Price', fieldName: 'unitprice'}
 ];
+const add_product_discount_columns = [
+    {label: 'Name', fieldName:'nameUrl',type:'url',typeAttributes: {label:{fieldName:'Name'},target: '_blank'}},
+    {label: 'Quantity',fieldName:'quantity',editable:true},
+    {label: 'List Price',fieldName:'unitprice'},
+    {label: 'discount',fieldName:'discount',editable:true},
+]
 export default class DemoButtonMenu extends LightningElement {
     @api recordId;
     @track product;
@@ -17,6 +23,9 @@ export default class DemoButtonMenu extends LightningElement {
     @track add_product_discount = false; // if true add_prisect_discount will be present
     @track columns = columns;   
     @track add_product_display_list = [];
+    @track add_product_discount_list = [];
+    @track discount_column = add_product_discount_columns;
+    @track draftValues = [];
     @track
     items = [
         {
@@ -51,8 +60,10 @@ export default class DemoButtonMenu extends LightningElement {
                 Id : this.product[i].Id,
                 Name :this.product[i].Name,
                 productcode:this.product[i].Product2.ProductCode,
-                nuitprice:this.product[i].UnitPrice.toFixed(2).toString(),
-                nameUrl:'/lightning/r/PricebookEntry/'+this.product[i].Id+'/view'
+                unitprice:this.product[i].UnitPrice.toFixed(2).toString(),
+                nameUrl:'/lightning/r/PricebookEntry/'+this.product[i].Id+'/view',
+                quantity:'0',
+                discount:'1'
             };
         }
     }
@@ -66,6 +77,11 @@ export default class DemoButtonMenu extends LightningElement {
         this.add_product_choose_product = false;
     }
     add_product_choose_product_next_page(){//this function is for add_product
+        var el = this.template.querySelector('lightning-datatable'); 
+        var get_select = el.getSelectedRows();
+        for(let i = 0 ; i<get_select.length;i++){
+            this.add_product_discount_list[i] = get_select[i];
+        }
         this.add_product_discount = true;
         this.add_product_choose_product = false;
 
@@ -86,5 +102,23 @@ export default class DemoButtonMenu extends LightningElement {
                 this.error = error;
             });
         }
+    }
+    handleSave(event){
+        var discount = 1;
+        var quantity = 0;
+        if(event.detail.draftValues[0].discount != undefined){
+            discount = event.detail.draftValues[0].discount;
+            console.log("discount="+discount);
+        }
+        if(event.detail.draftValues[0].quantity != undefined){
+            quantity = event.detail.draftValues[0].quantity;
+            console.log("quantity="+quantity);
+        }
+    }
+    add_product_discount_next_page(){
+        this.add_product_discount = false;
+    }
+    add_product_discount_close_page(){
+        this.add_product_discount = false;
     }
 }
