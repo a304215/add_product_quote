@@ -9,12 +9,6 @@ const columns = [
     { label: 'part number', fieldName: 'productcode'},
     { label: 'List Price', fieldName: 'unitprice'}
 ];
-const add_product_discount_columns = [
-    {label: 'Name', fieldName:'nameUrl',type:'url',typeAttributes: {label:{fieldName:'Name'},target: '_blank'}},
-    {label: 'Quantity',fieldName:'quantity',editable:true},
-    {label: 'List Price',fieldName:'unitprice'},
-    {label: 'discount',fieldName:'discount',editable:true},
-]
 export default class DemoButtonMenu extends LightningElement {
     @api recordId;
     @track product;
@@ -24,8 +18,7 @@ export default class DemoButtonMenu extends LightningElement {
     @track columns = columns;   
     @track add_product_display_list = [];
     @track add_product_discount_list = [];
-    @track discount_column = add_product_discount_columns;
-    @track draftValues = [];
+    @track updata_list = [];
     @track
     items = [
         {
@@ -48,6 +41,7 @@ export default class DemoButtonMenu extends LightningElement {
     wiredContacts({ error, data }) {
         if (data) {
             this.product = data;
+            this.add_product_discount_list = [];
             this.do_for();
         } else if (error) {
             this.error = error;
@@ -63,7 +57,10 @@ export default class DemoButtonMenu extends LightningElement {
                 unitprice:this.product[i].UnitPrice.toFixed(2).toString(),
                 nameUrl:'/lightning/r/PricebookEntry/'+this.product[i].Id+'/view',
                 quantity:'0',
-                discount:'1'
+                discount:'1',
+                total : "",
+                select_id:"",
+                product2id:this.product[i].Product2Id
             };
         }
     }
@@ -81,6 +78,7 @@ export default class DemoButtonMenu extends LightningElement {
         var get_select = el.getSelectedRows();
         for(let i = 0 ; i<get_select.length;i++){
             this.add_product_discount_list[i] = get_select[i];
+            this.add_product_discount_list[i].select_id = i.toString();
         }
         this.add_product_discount = true;
         this.add_product_choose_product = false;
@@ -90,12 +88,11 @@ export default class DemoButtonMenu extends LightningElement {
         const isEnterKey = evt.keyCode === 13;
         if (isEnterKey) {
             this.queryTerm = evt.target.value;
+            console.log(evt.target.placeholder);
             ReturnPBEList_search({word:evt.target.value,opportunity_id:this.recordId})
             .then(result => {
                 this.add_product_display_list = [];
                 this.product = result;
-                console.log(evt.target.value);
-                console.log(result);
                 this.do_for();
             })
             .catch(error => {
@@ -103,22 +100,54 @@ export default class DemoButtonMenu extends LightningElement {
             });
         }
     }
-    handleSave(event){
-        var discount = 1;
-        var quantity = 0;
-        if(event.detail.draftValues[0].discount != undefined){
-            discount = event.detail.draftValues[0].discount;
-            console.log("discount="+discount);
-        }
-        if(event.detail.draftValues[0].quantity != undefined){
-            quantity = event.detail.draftValues[0].quantity;
-            console.log("quantity="+quantity);
-        }
-    }
     add_product_discount_next_page(){
-        this.add_product_discount = false;
+        //this.add_product_discount = false;
+        for(let i = 0; i < this.add_product_discount_list.length;i++){
+            this.updata_list[i] = this.add_product_discount_list[i].Id+","+this.add_product_discount_list[i].Name+","+this.add_product_discount_list[i].productcode+","+this.add_product_discount_list[i].unitprice+","+this.add_product_discount_list[i].quantity+","+this.add_product_discount_list[i].discount+","+this.add_product_discount_list[i].total+this.add_product_discount_list[i].product2id
+        }
+        console.log(this.updata_list);
     }
     add_product_discount_close_page(){
+        for(let i = 0; i < this.add_product_discount_list.length;i++){
+            this.add_product_discount_list[i].total = "";
+            this.add_product_discount_list[i].discount = "1";
+            this.add_product_discount_list[i].quantity = "0";
+        }
         this.add_product_discount = false;
+    }
+    discount_save(evt){
+        var now_select = "";
+        var total = 0;
+        const isEnterKey = evt.keyCode === 13;
+        if(isEnterKey){
+            now_select = evt.target.name;  
+            for(let i = 0 ; i < this.add_product_discount_list.length;i++){
+                if(now_select === this.add_product_discount_list[i].select_id){
+                    this.add_product_discount_list[i].discount = evt.target.value;
+                    total = parseFloat(this.add_product_discount_list[i].discount)*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
+                    console.log(total);
+                    this.add_product_discount_list[i].total = total.toString();                   
+                    console.log(this.add_product_discount_list[i].discount)
+                    console.log(now_select);
+                }
+            }
+
+        }
+    }
+    quantity_save(evt){
+        var now_select = "";
+        var total = 0;
+        const isEnterKey = evt.keyCode === 13;
+        if(isEnterKey){
+            now_select = evt.target.name;  
+            for(let i = 0 ; i < this.add_product_discount_list.length;i++){
+                if(now_select === this.add_product_discount_list[i].select_id){
+                    this.add_product_discount_list[i].quantity = evt.target.value;
+                    total = parseFloat(this.add_product_discount_list[i].discount)*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
+                    this.add_product_discount_list[i].total = total.toString();                   
+                }
+            }
+
+        }
     }
 }

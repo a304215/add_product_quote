@@ -13,3 +13,6 @@
 label{
     font-size: 20px;
 }
+.slds-p-around_medium1{
+    padding-bottom: var(--lwc-spacingMedium,1rem);
+}

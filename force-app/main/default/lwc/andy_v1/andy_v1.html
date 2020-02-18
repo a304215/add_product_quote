@@ -22,6 +22,7 @@
             <lightning-input
               name="enter-search"
               type="search"
+              placeholder="test"
               onkeyup={handleKeyUp}
             ></lightning-input>
           </div>
@@ -30,6 +31,7 @@
           <lightning-datatable  key-field="Id" 
                                 data={add_product_display_list} 
                                 columns={columns} 
+                                placeholder = "test"
                                 show-row-number-column="true"> 
           </lightning-datatable> 
         </div>                  
@@ -48,21 +50,30 @@
           <h2  class="slds-modal__title slds-hyphenate">Add Product</h2>
           <h2  class="header-font slds-hyphenate">Price Book: TTSC-TSC-CNY List Pricebook</h2>
         </header>
-        <div>
-          <div style="height: 300px;"> 
-            <lightning-datatable  key-field="Id" 
-                                  data={add_product_discount_list} 
-                                  columns={discount_column} 
-                                  show-row-number-column="true"
-                                  onsave={handleSave}
-                                  draft-values={draftValues}> 
-            </lightning-datatable> 
-          </div>                   
-          <footer class="slds-modal__footer">
-            <button class="slds-button slds-button_neutral" onclick={add_product_discount_close_page}>Cancel</button>
-            <button class="slds-button slds-button_brand" onclick={add_product_discount_next_page}>Save</button>
-          </footer>
+        <div class="slds-modal__content slds-p-around_medium1">    
+          <table>
+            <tr class="slds-modal__footer">
+              <th>product Name</th>
+              <th>quantity</th>
+              <th>priceList</th>
+              <th>discount</th>
+              <th>totalprice</th>
+            </tr>
+            <template for:each={add_product_discount_list} for:item="product_detail">
+                <tr key ={product_detail.Name}>
+                  <td><a href={product_detail.nameUrl}>{product_detail.Name}</a></td>
+                  <td><lightning-input  name ={product_detail.select_id} value={product_detail.quantity} onkeyup={quantity_save}></lightning-input></td>
+                  <td><lightning-input  readonly = "" name = "unitprice" value={product_detail.unitprice}></lightning-input></td>
+                  <td><lightning-input  name ={product_detail.select_id} value={product_detail.discount} onkeyup={discount_save}></lightning-input></td>
+                  <td><lightning-input  value={product_detail.total} readonly=""></lightning-input></td>
+                </tr>
+            </template>
+          </table>
         </div>
+        <footer class="slds-modal__footer">
+          <button class="slds-button slds-button_neutral" onclick={add_product_discount_close_page}>Cancel</button>
+          <button class="slds-button slds-button_brand" onclick={add_product_discount_next_page}>Save</button>
+        </footer>
       </div>
     </section>
     <div class="slds-backdrop slds-backdrop_open"></div>
