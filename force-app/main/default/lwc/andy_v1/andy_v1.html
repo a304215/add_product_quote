@@ -22,7 +22,7 @@
             <lightning-input
               name="enter-search"
               type="search"
-              placeholder="test"
+              placeholder="search"
               onkeyup={handleKeyUp}
             ></lightning-input>
           </div>
@@ -31,7 +31,7 @@
           <lightning-datatable  key-field="Id" 
                                 data={add_product_display_list} 
                                 columns={columns} 
-                                placeholder = "test"
+                                placeholder = "search"
                                 show-row-number-column="true"> 
           </lightning-datatable> 
         </div>                  
@@ -53,11 +53,12 @@
         <div class="slds-modal__content slds-p-around_medium1">    
           <table>
             <tr class="slds-modal__footer">
-              <th>product Name</th>
-              <th>quantity</th>
-              <th>priceList</th>
-              <th>discount</th>
-              <th>totalprice</th>
+              <th style="padding-right:20px;">Product Name</th>
+              <th>Quantity</th>
+              <th>List Price</th>
+              <th>Discount</th>
+              <th>Sale Price</th>
+              <th>Total Price</th>
             </tr>
             <template for:each={add_product_discount_list} for:item="product_detail">
                 <tr key ={product_detail.Name}>
@@ -65,6 +66,7 @@
                   <td><lightning-input  name ={product_detail.select_id} value={product_detail.quantity} onkeyup={quantity_save}></lightning-input></td>
                   <td><lightning-input  readonly = "" name = "unitprice" value={product_detail.unitprice}></lightning-input></td>
                   <td><lightning-input  name ={product_detail.select_id} value={product_detail.discount} onkeyup={discount_save}></lightning-input></td>
+                  <td><lightning-input readonly = "" name = "sale_price" value={product_detail.sale_price}></lightning-input></td>
                   <td><lightning-input  value={product_detail.total} readonly=""></lightning-input></td>
                 </tr>
             </template>

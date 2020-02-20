@@ -1,6 +1,7 @@
 import { LightningElement, api, track ,wire} from 'lwc';
 import ReturnPBEList from '@salesforce/apex/NewProductByDiscount.ReturnPBEList';
 import ReturnPBEList_search from '@salesforce/apex/NewProductByDiscount.ReturnPBEList_search';
+import product_back from '@salesforce/apex/NewProductByDiscount.product_back';
 
 const columns = [ 
     { label: 'Name', fieldName: 'nameUrl',
@@ -60,7 +61,8 @@ export default class DemoButtonMenu extends LightningElement {
                 discount:'1',
                 total : "",
                 select_id:"",
-                product2id:this.product[i].Product2Id
+                product2id:this.product[i].Product2Id,
+                sale_price:""
             };
         }
     }
@@ -101,11 +103,20 @@ export default class DemoButtonMenu extends LightningElement {
         }
     }
     add_product_discount_next_page(){
-        //this.add_product_discount = false;
         for(let i = 0; i < this.add_product_discount_list.length;i++){
-            this.updata_list[i] = this.add_product_discount_list[i].Id+","+this.add_product_discount_list[i].Name+","+this.add_product_discount_list[i].productcode+","+this.add_product_discount_list[i].unitprice+","+this.add_product_discount_list[i].quantity+","+this.add_product_discount_list[i].discount+","+this.add_product_discount_list[i].total+this.add_product_discount_list[i].product2id
+            this.updata_list[i] = this.add_product_discount_list[i].Id+","+this.add_product_discount_list[i].sale_price+","+this.add_product_discount_list[i].quantity+","+this.add_product_discount_list[i].discount;
         }
         console.log(this.updata_list);
+        console.log(this.recordId);
+        product_back({products:this.updata_list,opp_id:this.recordId,status:true})
+            .then(result => {
+                console.log(result);
+                alert(result);
+            })
+            .catch(error => {
+                this.error = error;
+            });
+        this.add_product_discount = false;
     }
     add_product_discount_close_page(){
         for(let i = 0; i < this.add_product_discount_list.length;i++){
@@ -118,6 +129,7 @@ export default class DemoButtonMenu extends LightningElement {
     discount_save(evt){
         var now_select = "";
         var total = 0;
+        var sale_price = 0;
         const isEnterKey = evt.keyCode === 13;
         if(isEnterKey){
             now_select = evt.target.name;  
@@ -128,7 +140,9 @@ export default class DemoButtonMenu extends LightningElement {
                     console.log(total);
                     this.add_product_discount_list[i].total = total.toString();                   
                     console.log(this.add_product_discount_list[i].discount)
-                    console.log(now_select);
+                    console.log(now_select); 
+                    sale_price= parseFloat(this.add_product_discount_list[i].discount)*parseFloat(this.add_product_discount_list[i].unitprice);
+                    this.add_product_discount_list[i].sale_price = sale_price.toString();
                 }
             }
 
