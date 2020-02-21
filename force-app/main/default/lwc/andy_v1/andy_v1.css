@@ -16,3 +16,9 @@ label{
 .slds-p-around_medium1{
     padding-bottom: var(--lwc-spacingMedium,1rem);
 }
+th{
+    margin: 10px;
+}
+td{
+    margin: 10px;
+}

@@ -1,4 +1,5 @@
 import { LightningElement, api, track ,wire} from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import ReturnPBEList from '@salesforce/apex/NewProductByDiscount.ReturnPBEList';
 import ReturnPBEList_search from '@salesforce/apex/NewProductByDiscount.ReturnPBEList_search';
 import product_back from '@salesforce/apex/NewProductByDiscount.product_back';
@@ -12,6 +13,7 @@ const columns = [
 ];
 export default class DemoButtonMenu extends LightningElement {
     @api recordId;
+    @track result_message = "";
     @track product;
     @track error;
     @track add_product_choose_product = false; // if true choose_product will be present
@@ -38,7 +40,7 @@ export default class DemoButtonMenu extends LightningElement {
             value: 'gamma',
         }
     ];
-    @wire(ReturnPBEList,{opportunity_id:'$recordId'})
+    @wire(ReturnPBEList,{opp_id:'$recordId'})
     wiredContacts({ error, data }) {
         if (data) {
             this.product = data;
@@ -57,12 +59,12 @@ export default class DemoButtonMenu extends LightningElement {
                 productcode:this.product[i].Product2.ProductCode,
                 unitprice:this.product[i].UnitPrice.toFixed(2).toString(),
                 nameUrl:'/lightning/r/PricebookEntry/'+this.product[i].Id+'/view',
-                quantity:'0',
-                discount:'1',
-                total : "",
+                quantity:'1',
+                discount:'100',
+                total : this.product[i].UnitPrice.toFixed(2).toString(),
                 select_id:"",
                 product2id:this.product[i].Product2Id,
-                sale_price:""
+                sale_price:this.product[i].UnitPrice.toFixed(2).toString()
             };
         }
     }
@@ -111,12 +113,14 @@ export default class DemoButtonMenu extends LightningElement {
         product_back({products:this.updata_list,opp_id:this.recordId,status:true})
             .then(result => {
                 console.log(result);
-                alert(result);
+                this.result_message = result;
+                this.showNotification();
             })
             .catch(error => {
                 this.error = error;
             });
         this.add_product_discount = false;
+
     }
     add_product_discount_close_page(){
         for(let i = 0; i < this.add_product_discount_list.length;i++){
@@ -136,13 +140,13 @@ export default class DemoButtonMenu extends LightningElement {
             for(let i = 0 ; i < this.add_product_discount_list.length;i++){
                 if(now_select === this.add_product_discount_list[i].select_id){
                     this.add_product_discount_list[i].discount = evt.target.value;
-                    total = parseFloat(this.add_product_discount_list[i].discount)*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
+                    total = parseFloat(this.add_product_discount_list[i].discount)/100*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
                     console.log(total);
-                    this.add_product_discount_list[i].total = total.toString();                   
+                    this.add_product_discount_list[i].total = total.toFixed(2).toString();                   
                     console.log(this.add_product_discount_list[i].discount)
                     console.log(now_select); 
-                    sale_price= parseFloat(this.add_product_discount_list[i].discount)*parseFloat(this.add_product_discount_list[i].unitprice);
-                    this.add_product_discount_list[i].sale_price = sale_price.toString();
+                    sale_price= parseFloat(this.add_product_discount_list[i].discount)/100*parseFloat(this.add_product_discount_list[i].unitprice);
+                    this.add_product_discount_list[i].sale_price = sale_price.toFixed(2).toString();
                 }
             }
 
@@ -157,11 +161,31 @@ export default class DemoButtonMenu extends LightningElement {
             for(let i = 0 ; i < this.add_product_discount_list.length;i++){
                 if(now_select === this.add_product_discount_list[i].select_id){
                     this.add_product_discount_list[i].quantity = evt.target.value;
-                    total = parseFloat(this.add_product_discount_list[i].discount)*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
-                    this.add_product_discount_list[i].total = total.toString();                   
+                    total = parseFloat(this.add_product_discount_list[i].discount)/100*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
+                    this.add_product_discount_list[i].total = total.toFixed(2).toString();                   
                 }
             }
 
         }
+    }
+    showNotification() {
+        var variant_status = "";
+        var evt;
+        if(this.result_message ==='Insertsuccessed'){
+            variant_status = 'success';
+            evt = new ShowToastEvent({
+                title: 'Return message',
+                message:this.result_message,
+                variant: variant_status,
+            });
+        }else{
+            variant_status = 'error'
+            evt = new ShowToastEvent({
+                title: 'Return message',
+                message:this.result_message,
+                variant: variant_status,
+            });
+        }        
+        this.dispatchEvent(evt);
     }
 }
