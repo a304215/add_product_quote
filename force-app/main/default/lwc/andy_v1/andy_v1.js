@@ -3,25 +3,30 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import ReturnPBEList from '@salesforce/apex/NewProductByDiscount.ReturnPBEList';
 import ReturnPBEList_search from '@salesforce/apex/NewProductByDiscount.ReturnPBEList_search';
 import product_back from '@salesforce/apex/NewProductByDiscount.product_back';
-
+import check_pb2id from '@salesforce/apex/NewProductByDiscount.check_pb2id';
+import Return_PB2 from '@salesforce/apex/NewProductByDiscount.Return_PB2';
 const columns = [ 
     { label: 'Name', fieldName: 'nameUrl',
     type: 'url',
     typeAttributes: {label:{fieldName:'Name'},target: '_blank'}}, 
-    { label: 'part number', fieldName: 'productcode'},
+    { label: 'Part Number', fieldName: 'productcode'},
     { label: 'List Price', fieldName: 'unitprice'}
 ];
+
 export default class DemoButtonMenu extends LightningElement {
     @api recordId;
     @track result_message = "";
     @track product;
+    @track pricebook_name = "";
     @track error;
+    @track add_product_pricebook = false;
     @track add_product_choose_product = false; // if true choose_product will be present
     @track add_product_discount = false; // if true add_prisect_discount will be present
     @track columns = columns;   
     @track add_product_display_list = [];
     @track add_product_discount_list = [];
     @track updata_list = [];
+    @track pricebook_select = [];
     @track
     items = [
         {
@@ -34,11 +39,6 @@ export default class DemoButtonMenu extends LightningElement {
             label: 'edit product',
             value: 'edit_product',
         },
-        {
-            id: 'menu-item-3',
-            label: 'Gamma',
-            value: 'gamma',
-        }
     ];
     @wire(ReturnPBEList,{opp_id:'$recordId'})
     wiredContacts({ error, data }) {
@@ -46,6 +46,15 @@ export default class DemoButtonMenu extends LightningElement {
             this.product = data;
             this.add_product_discount_list = [];
             this.do_for();
+            console.log(data);
+        } else if (error) {
+            this.error = error;
+            this.contacts = undefined;
+        }
+    }
+    @wire(Return_PB2)wiredContacts({ error, data }) {
+        if (data) {
+            this.pricebook_select = data;            
         } else if (error) {
             this.error = error;
             this.contacts = undefined;
@@ -71,8 +80,33 @@ export default class DemoButtonMenu extends LightningElement {
     handleMenuSelect(event) {//this function is for add_product
         const chooses = event.detail.value;
         if(chooses === "add_product"){
-            this.add_product_choose_product= true;
+            check_pb2id({opp_id:this.recordId})
+            .then(result => {
+                if(result==='0'){
+                    this.add_product_pricebook = true;
+                }
+                else{
+                    console.log("check");
+                    this.pricebook_name = result;
+                    this.add_product_choose_product = true;
+                }
+            })
+            .catch(error => {
+                this.error = error;
+            });
+            //this.add_product_pricebook= true;
         }
+    }
+    get hasDefaultResults() {
+        //check if array has data
+        if(this.pricebook_select.length > 0){
+              //here as an example, i set the second element from 
+              //the array as the default, this can be whatever you want
+            return (this.pricebook_select[1]);
+        }
+    }
+    handle_select(event){
+        this.pricebook_name = event.detail.value;
     }
     add_product_choose_product_close_page(){//this function is for add_product
         this.add_product_choose_product = false;
@@ -92,11 +126,12 @@ export default class DemoButtonMenu extends LightningElement {
         const isEnterKey = evt.keyCode === 13;
         if (isEnterKey) {
             this.queryTerm = evt.target.value;
-            console.log(evt.target.placeholder);
-            ReturnPBEList_search({word:evt.target.value,opportunity_id:this.recordId})
+            console.log(evt.target.value);
+            ReturnPBEList_search({word:evt.target.value,opp_id:this.recordId})
             .then(result => {
                 this.add_product_display_list = [];
                 this.product = result;
+                console.log("test");
                 this.do_for();
             })
             .catch(error => {

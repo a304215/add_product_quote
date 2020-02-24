@@ -22,3 +22,6 @@ th{
 td{
     margin: 10px;
 }
+.choose{
+    overflow: initial;
+}
