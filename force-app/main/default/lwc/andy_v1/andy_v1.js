@@ -18,6 +18,7 @@ export default class DemoButtonMenu extends LightningElement {
     @track result_message = "";
     @track product;
     @track pricebook_name = "";
+    @track pricebook_id = "test";
     @track error;
     @track add_product_pricebook = false;
     @track add_product_choose_product = false; // if true choose_product will be present
@@ -54,7 +55,12 @@ export default class DemoButtonMenu extends LightningElement {
     }
     @wire(Return_PB2)wiredContacts({ error, data }) {
         if (data) {
-            this.pricebook_select = data;            
+            for(let i = 0;i < data.length;i++){
+                this.pricebook_select[i] = {
+                    label:data[i].Name,
+                    value:data[i].Id,
+                }
+            }            
         } else if (error) {
             this.error = error;
             this.contacts = undefined;
@@ -94,19 +100,24 @@ export default class DemoButtonMenu extends LightningElement {
             .catch(error => {
                 this.error = error;
             });
-            //this.add_product_pricebook= true;
-        }
-    }
-    get hasDefaultResults() {
-        //check if array has data
-        if(this.pricebook_select.length > 0){
-              //here as an example, i set the second element from 
-              //the array as the default, this can be whatever you want
-            return (this.pricebook_select[1]);
+            //this.add_product_pricebook= true; 
         }
     }
     handle_select(event){
-        this.pricebook_name = event.detail.value;
+        for(let i  = 0 ;i < this.pricebook_select.length;i++){
+            if(event.detail.value==this.pricebook_select[i].value){
+                this.pricebook_name = this.pricebook_select[i].label;
+                this.pricebook_id = event.detail.value;
+                break;
+            }
+        }
+        //this.pricebook_name = event.detail.value;
+    }
+    add_product_pricebook_next_page(){
+        
+    }
+    add_product_pricebook_close_page(){
+        this.add_product_pricebook = false;
     }
     add_product_choose_product_close_page(){//this function is for add_product
         this.add_product_choose_product = false;

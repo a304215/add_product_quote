@@ -11,30 +11,28 @@
     </template>
   </lightning-button-menu>
   <div if:true={add_product_pricebook}>
-    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+    <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"  aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
       <div class="slds-modal__container">
         <header class="slds-modal__header">
           <h2  class="slds-modal__title slds-hyphenate">Choose Price Book</h2>
         </header>
-        <div class="slds-modal__content slds-p-around_medium">
+        <div class="slds-modal__content slds-p-around_medium" style="overflow: visible;">
           <div>
             Select a Price Book to associate with this opportunity. 
           You can add products only from the Price Book you associate with this opportunity. 
           Changing the Price Book deletes all products from the opportunity.
           </div>
           <div class="slds-m-around_medium">
-            <select class="slds-select" onchange={handle_select} >
-              <template if:true={hasDefaultResults}> 
-                <option value={hasDefaultResults.Id}>{hasDefaultResults.Name}</option>
-              </template>
-              <template  for:each={pricebook_select} for:item="pricebook">
-                <option key={pricebook.Id} value={pricebook.Id} >{pricebook.Name}</option>
-              </template>
-            </select> 
-        </div>
+            <lightning-combobox
+            name="Name"
+            value="Name"
+            placeholder="NULL"
+            options={pricebook_select}
+            onchange={handle_select} ></lightning-combobox>
+          </div>
         </div>                 
         <footer class="slds-modal__footer">
-          <button class="slds-button slds-button_neutral" onclick={add_product_choose_product_close_page}>Cancel</button>
+          <button class="slds-button slds-button_neutral" onclick={add_product_pricebook_close_page}>Cancel</button>
           <button class="slds-button slds-button_brand" onclick={add_product_choose_product_next_page}>Next</button>
         </footer>
       </div>
