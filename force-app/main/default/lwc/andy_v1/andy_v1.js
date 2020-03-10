@@ -6,6 +6,7 @@ import product_back from '@salesforce/apex/NewProductByDiscount.product_back';
 import check_pb2id from '@salesforce/apex/NewProductByDiscount.check_PB2Id';
 import Return_PB2 from '@salesforce/apex/NewProductByDiscount.Return_PB2';
 import PB2_back from '@salesforce/apex/NewProductByDiscount.PB2_back';
+import quote_find_oppoid from '@salesforce/apex/NewProductByDiscount.quote_find_oppoid';
 const columns = [ 
     { label: 'Name', fieldName: 'nameUrl',
     type: 'url',
@@ -35,6 +36,7 @@ export default class DemoButtonMenu extends LightningElement {
     @track add_product_discount_list = [];
     @track updata_list = [];
     @track pricebook_select = [];
+    @track opp_id = "";
     @track
     items = [
         {
@@ -48,7 +50,17 @@ export default class DemoButtonMenu extends LightningElement {
             value: 'edit_product',
         },
     ];
-    @wire(ReturnPBEList,{opp_id:'$recordId'})
+    @wire(quote_find_oppoid,{quoteid:'$recordId'})
+    get_opp_id({error,data}){
+        if(data){
+            console.log("get_in")
+            this.opp_id = data;
+            console.log(this.opp_id);
+        }else if(error){
+            console.log(error);
+        }
+    }
+    @wire(ReturnPBEList,{quoteid:'$recordId'})
     wiredContacts({ error, data }) {
         if (data) {
             console.log("test");
@@ -92,9 +104,11 @@ export default class DemoButtonMenu extends LightningElement {
         }
     }
     handleMenuSelect(event) {//this function is for add_product
+        console.log(this.recordId);
         const chooses = event.detail.value;
         //if(chooses === "add_product"){
-            check_pb2id({opp_id:this.recordId})
+
+            check_pb2id({opp_id:this.opp_id})
             .then(result => {
                 if(result==='0'){
                     this.add_product_pricebook = true;
@@ -123,7 +137,7 @@ export default class DemoButtonMenu extends LightningElement {
         //this.pricebook_name = event.detail.value;
     }
     add_product_pricebook_next_page(){
-        PB2_back({opp_id:this.recordId,pb2_id:this.pricebook_id})
+        PB2_back({opp_id:this.opp_id,pb2_id:this.pricebook_id})
             .then(result => {
                 console.log(result);
                 this.product = result;
@@ -158,7 +172,7 @@ export default class DemoButtonMenu extends LightningElement {
         if (isEnterKey) {
             this.queryTerm = evt.target.value;
             console.log(evt.target.value);
-            ReturnPBEList_search({word:evt.target.value,opp_id:this.recordId})
+            ReturnPBEList_search({word:evt.target.value,opp_id:this.opp_id})
             .then(result => {
                 this.add_product_display_list = [];
                 this.product = result;
@@ -176,7 +190,7 @@ export default class DemoButtonMenu extends LightningElement {
         }
         console.log(this.updata_list);
         console.log(this.recordId);
-        product_back({products:this.updata_list,opp_id:this.recordId,status:true})
+        product_back({products:this.updata_list,opp_id:this.opp_id,status:true})
             .then(result => {
                 console.log(result);
                 this.result_message = result;
