@@ -3,8 +3,9 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import ReturnPBEList from '@salesforce/apex/NewProductByDiscount.ReturnPBEList';
 import ReturnPBEList_search from '@salesforce/apex/NewProductByDiscount.ReturnPBEList_search';
 import product_back from '@salesforce/apex/NewProductByDiscount.product_back';
-import check_pb2id from '@salesforce/apex/NewProductByDiscount.check_pb2id';
+import check_pb2id from '@salesforce/apex/NewProductByDiscount.check_PB2Id';
 import Return_PB2 from '@salesforce/apex/NewProductByDiscount.Return_PB2';
+import PB2_back from '@salesforce/apex/NewProductByDiscount.PB2_back';
 const columns = [ 
     { label: 'Name', fieldName: 'nameUrl',
     type: 'url',
@@ -15,6 +16,12 @@ const columns = [
 
 export default class DemoButtonMenu extends LightningElement {
     @api recordId;
+    @api
+    focusOnError(sfieldId){
+        /* eslint-disable no-console */
+        console.log('Id Recieved in child component : ',sfieldId);
+        this.template.querySelector(`[data-id="${this.sfieldId}"]`).focus();
+    }
     @track result_message = "";
     @track product;
     @track pricebook_name = "";
@@ -44,6 +51,7 @@ export default class DemoButtonMenu extends LightningElement {
     @wire(ReturnPBEList,{opp_id:'$recordId'})
     wiredContacts({ error, data }) {
         if (data) {
+            console.log("test");
             this.product = data;
             this.add_product_discount_list = [];
             this.do_for();
@@ -53,7 +61,7 @@ export default class DemoButtonMenu extends LightningElement {
             this.contacts = undefined;
         }
     }
-    @wire(Return_PB2)wiredContacts({ error, data }) {
+    @wire(Return_PB2)get_pricebook_name({ error, data }) {
         if (data) {
             for(let i = 0;i < data.length;i++){
                 this.pricebook_select[i] = {
@@ -85,23 +93,24 @@ export default class DemoButtonMenu extends LightningElement {
     }
     handleMenuSelect(event) {//this function is for add_product
         const chooses = event.detail.value;
-        if(chooses === "add_product"){
+        //if(chooses === "add_product"){
             check_pb2id({opp_id:this.recordId})
             .then(result => {
                 if(result==='0'){
                     this.add_product_pricebook = true;
                 }
-                else{
-                    console.log("check");
+                else{   
                     this.pricebook_name = result;
+                    console.log("check");
                     this.add_product_choose_product = true;
+                    console.log(this.add_product_display_list);
                 }
             })
             .catch(error => {
                 this.error = error;
             });
             //this.add_product_pricebook= true; 
-        }
+        //}
     }
     handle_select(event){
         for(let i  = 0 ;i < this.pricebook_select.length;i++){
@@ -114,7 +123,17 @@ export default class DemoButtonMenu extends LightningElement {
         //this.pricebook_name = event.detail.value;
     }
     add_product_pricebook_next_page(){
-        
+        PB2_back({opp_id:this.recordId,pb2_id:this.pricebook_id})
+            .then(result => {
+                console.log(result);
+                this.product = result;
+                do_for();
+            })
+            .catch(error => {
+                this.error = error;
+            });
+            console.log(this.product);
+            this.add_product_pricebook = false;
     }
     add_product_pricebook_close_page(){
         this.add_product_pricebook = false;
@@ -125,6 +144,7 @@ export default class DemoButtonMenu extends LightningElement {
     add_product_choose_product_next_page(){//this function is for add_product
         var el = this.template.querySelector('lightning-datatable'); 
         var get_select = el.getSelectedRows();
+        this.add_product_discount_list = [];
         for(let i = 0 ; i<get_select.length;i++){
             this.add_product_discount_list[i] = get_select[i];
             this.add_product_discount_list[i].select_id = i.toString();
@@ -180,54 +200,46 @@ export default class DemoButtonMenu extends LightningElement {
         var now_select = "";
         var total = 0;
         var sale_price = 0;
-        const isEnterKey = evt.keyCode === 13;
-        if(isEnterKey){
-            now_select = evt.target.name;  
-            for(let i = 0 ; i < this.add_product_discount_list.length;i++){
-                if(now_select === this.add_product_discount_list[i].select_id){
-                    this.add_product_discount_list[i].discount = evt.target.value;
-                    total = parseFloat(this.add_product_discount_list[i].discount)/100*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
-                    console.log(total);
-                    this.add_product_discount_list[i].total = total.toFixed(2).toString();                   
-                    console.log(this.add_product_discount_list[i].discount)
-                    console.log(now_select); 
-                    sale_price= parseFloat(this.add_product_discount_list[i].discount)/100*parseFloat(this.add_product_discount_list[i].unitprice);
-                    this.add_product_discount_list[i].sale_price = sale_price.toFixed(2).toString();
-                }
+        now_select = evt.target.name;  
+        for(let i = 0 ; i < this.add_product_discount_list.length;i++){
+            if(now_select === this.add_product_discount_list[i].select_id){
+                this.add_product_discount_list[i].discount = evt.target.value;
+                total = parseFloat(this.add_product_discount_list[i].discount)/100*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
+                console.log(total);
+                this.add_product_discount_list[i].total = total.toFixed(2).toString();                   
+                console.log(this.add_product_discount_list[i].discount)
+                console.log(now_select); 
+                sale_price= parseFloat(this.add_product_discount_list[i].discount)/100*parseFloat(this.add_product_discount_list[i].unitprice);
+                this.add_product_discount_list[i].sale_price = sale_price.toFixed(2).toString();
             }
-
         }
     }
     quantity_save(evt){
         var now_select = "";
         var total = 0;
-        const isEnterKey = evt.keyCode === 13;
-        if(isEnterKey){
-            now_select = evt.target.name;  
-            for(let i = 0 ; i < this.add_product_discount_list.length;i++){
-                if(now_select === this.add_product_discount_list[i].select_id){
-                    this.add_product_discount_list[i].quantity = evt.target.value;
-                    total = parseFloat(this.add_product_discount_list[i].discount)/100*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
-                    this.add_product_discount_list[i].total = total.toFixed(2).toString();                   
-                }
+        now_select = evt.target.name;  
+        for(let i = 0 ; i < this.add_product_discount_list.length;i++){
+            if(now_select === this.add_product_discount_list[i].select_id){
+                this.add_product_discount_list[i].quantity = evt.target.value;
+                total = parseFloat(this.add_product_discount_list[i].discount)/100*parseFloat(this.add_product_discount_list[i].quantity)*parseFloat(this.add_product_discount_list[i].unitprice);
+                this.add_product_discount_list[i].total = total.toFixed(2).toString();                   
             }
-
         }
     }
     showNotification() {
         var variant_status = "";
         var evt;
-        if(this.result_message ==='Insertsuccessed'){
+        if(this.result_message ==='Insert successed'){
             variant_status = 'success';
             evt = new ShowToastEvent({
-                title: 'Return message',
+                title: '訊息回報',
                 message:this.result_message,
                 variant: variant_status,
             });
         }else{
             variant_status = 'error'
             evt = new ShowToastEvent({
-                title: 'Return message',
+                title: '訊息回報',
                 message:this.result_message,
                 variant: variant_status,
             });
