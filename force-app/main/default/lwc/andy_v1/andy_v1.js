@@ -1,6 +1,6 @@
 import { LightningElement, api, track ,wire} from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import ReturnPBEList from '@salesforce/apex/NewProductByDiscount.ReturnPBEList';
+import ReturnPBEList from '@salesforce/apex/NewProductByDiscount.ReturnPBEList_quote';
 import ReturnPBEList_search from '@salesforce/apex/NewProductByDiscount.ReturnPBEList_search';
 import product_back from '@salesforce/apex/NewProductByDiscount.product_back';
 import check_pb2id from '@salesforce/apex/NewProductByDiscount.check_PB2Id';
